@@ -13,13 +13,12 @@ def removeit(self):
 
 # Remove old kernels
 def removekernel():
-
     def get_oldkernels():
-        #return subprocess.run(['dpkg', '--list', '|', 'grep', '-E', '-o', '"linux-image-[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-generic"', '|', 'grep', '-o', '-E', '"[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+"', '|', 'uniq', '|', 'grep', '-E', '-v', '${dpkg', '--list', '|', 'grep', '-E', '-o', '"linux-image-[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-generic"', '|', 'grep', '-o', '-E', '"[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+"', '|', 'uniq', '|', 'sort', '-n', '-r', '|', 'head', '-1}'],stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        return 4.15 # testing
+        olders = subprocess.run(["../scripts/removekernel.sh"],stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        return olders
 
     def formating(*args):# args type = string ! Do not number
-        olders = (i for i in args)
+        olders = (i for i in str(args))
         terget = ("linux-headers-", "linux-image-")
         removed = [version + tgt for tgt in olders for version in terget]
         return removed
@@ -28,6 +27,7 @@ def removekernel():
         removed = args
         return subprocess.run(["apt-get", "autoremove", "--purge", "-y", removed],stderr = subprocess.PIPE)
 
+    #Main
     print("These kernels removed. {}".format(get_oldkernels()))
     print("Are you remove them? Y/n")
     anser = yesno(input())
@@ -51,5 +51,4 @@ def yesno(choice):
         else:
             return "Error"
 
-print(yesno(input()))
-#removekernel()
+removekernel()

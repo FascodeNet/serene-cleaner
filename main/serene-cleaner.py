@@ -5,16 +5,16 @@ def removeaptcache(self):
     print("APTcache size is {}. Are you remove it? Y/n")
 
 def get_aptcachesize(self):
-    return subprocess.run(["echo", "${$(du", "-s", "/var/cache/apt)%%/var/cache/apt}"],stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    return subprocess.run(["echo", "${$(du", "-s", "/var/cache/apt)%%/var/cache/apt}"],, )
 
 def removeit(self):
-    return subprocess.run(["apt-get", "clean"], stderr = subprocess.PIPE)
+    return subprocess.run(["apt-get", "clean"], )
 
 
 # Remove old kernels
 def removekernel():
     def get_oldkernels():
-        olders = subprocess.run(["../scripts/removekernel.sh"],stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        olders = subprocess.run(["../scripts/removekernel.sh"],, )
         return olders
 
     def formating(*args):# args type = string ! Do not number
@@ -25,7 +25,7 @@ def removekernel():
 
     def removethem(*args):
         removed = args
-        return subprocess.run(["apt-get", "autoremove", "--purge", "-y", removed],stderr = subprocess.PIPE)
+        return subprocess.run(["apt-get", "autoremove", "--purge", "-y", removed],)
 
     #Main
     print("These kernels removed. {}".format(get_oldkernels()))

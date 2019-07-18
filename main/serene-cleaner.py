@@ -14,7 +14,7 @@ def removeit(self):
 # Remove old kernels
 def removekernel():
     def get_oldkernels():
-        olders = subprocess.run(["../scripts/removekernel.sh"],, )
+        olders = subprocess.run(["../scripts/removekernel.sh"])
         return olders
 
     def formating(*args):# args type = string ! Do not number

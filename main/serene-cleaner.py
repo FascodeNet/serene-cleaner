@@ -15,9 +15,13 @@ def removeit(self):
 # Remove old kernels
 def removekernel():
     def get_oldkernels():
-        version = subprocess.run(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True, stdout=subprocess.PIPE)
+        output = subprocess.run(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True, stdout=subprocess.PIPE)
+        version = output.stdout.decode("UTF-8")
         installing = version.splitlines()
         del installing[0]
+        if not installing:
+            print("Do not have to remove old kernel.")
+            exit(0)
         olders = tuple(installing)
         return olders
 
@@ -35,11 +39,14 @@ def removekernel():
         return removed
 
     def removethem(*args):
-        removed = []
+        removed_l = []
         for i in range(len(args)):
             for n in range(len(args[i])):
-                removed.append(args[i][n])
-        return subprocess.call(["apt-get", "autoremove", "--purge", "-y", removed])
+                removed_l.append(args[i][n])
+        cmd = "sudo apt-get --purge -y autoremove"
+        command_l = cmd.split()
+        command_l.extend(removed_l)
+        subprocess.call(command_l)
 
     #Main
     print("These kernels removed. {}".format(get_oldkernels()))

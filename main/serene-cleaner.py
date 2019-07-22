@@ -15,22 +15,31 @@ def removeit(self):
 # Remove old kernels
 def removekernel():
     def get_oldkernels():
-        output = subprocess.check_output(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True)
-        version = output.decode("UTF-8")
+        version = subprocess.run(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True, stdout=subprocess.PIPE)
         installing = version.splitlines()
         del installing[0]
-        olders = installing
+        olders = tuple(installing)
         return olders
 
     def formating(*args):# args type = string ! Do not number
-        olders = args[0]
+        olders = []
+        for i in range(len(args)):
+            olders.append(args[i][i])
+        
         terget = ("linux-headers-", "linux-image-")
-        removed = [tgt + version for version in olders for tgt in terget ]
+        removed = []
+        for version in olders:
+            for tgt in terget:
+                removed.append(tgt + version)
+        #removed = [tgt + version for version in olders for tgt in terget ]
         return removed
 
     def removethem(*args):
-        removed = args
-        return subprocess.check_output(["apt-get", "autoremove", "--purge", "-y", removed])
+        removed = []
+        for i in range(len(args)):
+            for n in range(len(args[i])):
+                removed.append(args[i][n])
+        return subprocess.call(["apt-get", "autoremove", "--purge", "-y", removed])
 
     #Main
     print("These kernels removed. {}".format(get_oldkernels()))

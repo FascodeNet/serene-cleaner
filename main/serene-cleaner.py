@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import subprocess
+import re
 # Remove APT cache
 def removeaptcache(self):
     print("APTcache size is {}. Are you remove it? Y/n")
@@ -14,13 +15,17 @@ def removeit(self):
 # Remove old kernels
 def removekernel():
     def get_oldkernels():
-        olders = subprocess.check_output(["../scripts/removekernel.sh"])
+        output = subprocess.check_output(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True)
+        version = output.decode("UTF-8")
+        installing = version.splitlines()
+        del installing[0]
+        olders = installing
         return olders
 
     def formating(*args):# args type = string ! Do not number
-        olders = (i for i in str(args))
+        olders = args[0]
         terget = ("linux-headers-", "linux-image-")
-        removed = [version + tgt for tgt in olders for version in terget]
+        removed = [tgt + version for version in olders for tgt in terget ]
         return removed
 
     def removethem(*args):

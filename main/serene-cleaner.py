@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import subprocess
-import re
 # Remove APT cache
 def removeaptcache(self):
     print("APTcache size is {}. Are you remove it? Y/n")

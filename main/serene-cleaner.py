@@ -1,32 +1,28 @@
 #!/usr/bin/env python3
 import subprocess
 
-# Remove APT cache
-def cleanaptcache():
-    print("APT-cache size is {}MiB.\nAre you clean it?".format(get_aptcachesize()))
-    anser = yesno(input("Y/n "))
-    if anser == True:
-        cleanit()
-    else:
-        return 0
-
-def get_aptcachesize():
-    output = subprocess.run(["sudo", "du", "-sm", "/var/cache/apt"], stdout=subprocess.PIPE)
-    rawout =  output.stdout.decode("UTF-8")
-    size = [int(s) for s in rawout.split() if s.isdigit()][0]
-    return size
-
-def cleanit():
-    return subprocess.check_output(["sudo", "apt-get", "clean"])
-
+class clearcache():
+    def __init__(self, path):
+        rpath = path + r"/*"
+        self.searchpath = path.split()
+        self.removepath = rpath
+    def get_cachesize(self):
+        cmd = ["du", "-sm",]
+        cmd.extend(self.searchpath)
+        output = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        rawout = output.stdout.decode("UTF-8")
+        size = [int(s) for s in rawout.split() if s.isdigit()][0]
+        return size
+    def cleanit(self):
+        cmd = "sudo rm -r " + self.removepath
+        subprocess.run(cmd, shell=True)
+        return "Done"
 
 # Remove old kernels
-def removekernel():
-    olders = []
+class removekernel():
     removed = []
-    def get_oldkernels():
-        global olders
-        global removed
+    @classmethod
+    def get_oldkernels(self):
         output = subprocess.run(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True, stdout=subprocess.PIPE)
         rawout = output.stdout.decode("UTF-8")
         installing = rawout.splitlines()
@@ -36,24 +32,15 @@ def removekernel():
             print("Do not have to remove old kernel.")
             exit(0)
         terget = ("linux-headers-", "linux-image-")
-        removed = [tgt + version for version in olders for tgt in terget ]
-        return removed
-
-    def removethem():
-        global removed
+        self.removed = [tgt + version for version in olders for tgt in terget ]
+        return self.removed
+    @classmethod
+    def removethem(self):
         cmd = "sudo apt-get --purge -y autoremove"
         command_l = cmd.split()
-        command_l.extend(removed)
+        command_l.extend(self.removed)
         subprocess.call(command_l)
 
-    #Main
-    print("These kernels removed. {}".format(get_oldkernels()))
-    print("Are you remove them? Y/n")
-    anser = yesno(input())
-    if anser == True:
-        removethem()
-    else:
-        return 0
 
 
 #Others
@@ -82,3 +69,12 @@ def swich(choice):
     except IndexError:
         return "The task is not find."
     return task
+
+inst = clearcache(r"/var/cache/apt")
+#Main
+print("APT-cache size is {}MiB.\nAre you clean it?".format(inst.get_cachesize()))
+anser = yesno(input("Y/n "))
+if anser == True:
+    inst.cleanit()
+else:
+    exit(0)

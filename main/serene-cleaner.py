@@ -86,14 +86,3 @@ def swich(choice):
     except IndexError:
         return "The task is not find."
     return task
-
-
-
-#Main
-def main():
-    print()
-    task = swich(input("Please choice task."))
-    print(task)
-
-if __name__ == '__main__':
-    cleanaptcache()

@@ -1,51 +1,53 @@
 #!/usr/bin/env python3
 import subprocess
+import argparse
 import re
+
+task_dict = {"clean APT cache": "cleanaptcache", "remove old kernels": "removekernel"}
+
 # Remove APT cache
-def removeaptcache(self):
-    print("APTcache size is {}. Are you remove it? Y/n")
+def cleanaptcache():
+    print("APT-cache size is {}MiB.\nAre you clean it?".format(get_aptcachesize()))
+    anser = yesno(input("Y/n "))
+    if anser == True:
+        cleanit()
+    else:
+        return 0
 
-def get_aptcachesize(self):
-    return subprocess.check_output(["echo", "${$(du", "-s", "/var/cache/apt)%%/var/cache/apt}"])
+def get_aptcachesize():
+    output = subprocess.run(["sudo", "du", "-sm", "/var/cache/apt"], stdout=subprocess.PIPE)
+    rawout =  output.stdout.decode("UTF-8")
+    size = [int(s) for s in rawout.split() if s.isdigit()][0]
+    return size
 
-def removeit(self):
-    return subprocess.check_output(["apt-get", "clean"])
+def cleanit():
+    return subprocess.check_output(["sudo", "apt-get", "clean"])
 
 
 # Remove old kernels
 def removekernel():
+    olders = []
+    removed = []
     def get_oldkernels():
+        global olders
+        global removed
         output = subprocess.run(r'dpkg -l | grep -Eo "linux-image-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[0-9]" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+-[0-9]+" | uniq | sort -nr', shell=True, stdout=subprocess.PIPE)
-        version = output.stdout.decode("UTF-8")
-        installing = version.splitlines()
+        rawout = output.stdout.decode("UTF-8")
+        installing = rawout.splitlines()
         del installing[0]
+        olders = installing
         if not installing:
             print("Do not have to remove old kernel.")
             exit(0)
-        olders = tuple(installing)
-        return olders
-
-    def formating(*args):# args type = string ! Do not number
-        olders = []
-        for i in range(len(args)):
-            olders.append(args[i][i])
-        
         terget = ("linux-headers-", "linux-image-")
-        removed = []
-        for version in olders:
-            for tgt in terget:
-                removed.append(tgt + version)
-        #removed = [tgt + version for version in olders for tgt in terget ]
+        removed = [tgt + version for version in olders for tgt in terget ]
         return removed
 
-    def removethem(*args):
-        removed_l = []
-        for i in range(len(args)):
-            for n in range(len(args[i])):
-                removed_l.append(args[i][n])
+    def removethem():
+        global removed
         cmd = "sudo apt-get --purge -y autoremove"
         command_l = cmd.split()
-        command_l.extend(removed_l)
+        command_l.extend(removed)
         subprocess.call(command_l)
 
     #Main
@@ -53,7 +55,7 @@ def removekernel():
     print("Are you remove them? Y/n")
     anser = yesno(input())
     if anser == True:
-        removethem(formating(get_oldkernels()))
+        removethem()
     else:
         return 0
 
@@ -72,4 +74,26 @@ def yesno(choice):
         else:
             return "Error"
 
-removekernel()
+def swich(choice):
+    if choice == "":
+        return "Error"
+    try:
+        choice = int(choice[0])
+    except ValueError:
+        return "Please enter as an integer."
+    try:
+        task = list[choice - 1]
+    except IndexError:
+        return "The task is not find."
+    return task
+
+
+
+#Main
+def main():
+    print()
+    task = swich(input("Please choice task."))
+    print(task)
+
+if __name__ == '__main__':
+    cleanaptcache()

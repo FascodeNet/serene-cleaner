@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 import subprocess
-<<<<<<< HEAD
-=======
-import argparse
-import re
 
-task_dict = {"clean APT cache": "cleanaptcache", "remove old kernels": "removekernel"}
-
->>>>>>> testing
 # Remove APT cache
 def cleanaptcache():
     print("APT-cache size is {}MiB.\nAre you clean it?".format(get_aptcachesize()))

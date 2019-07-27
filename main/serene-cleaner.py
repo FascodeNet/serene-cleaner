@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 import subprocess
 import os.path
+import tkinter as tk
+
+root = tk.Tk()
+root.title("serene-cleaner")
+root.geometry("640x480")
+root.mainloop()
+
 class clearcache():
     def __init__(self, path):
         rpath = path + r"/*"
         self.searchpath = path.split()
         self.removepath = rpath
+
     def get_cachesize(self):
         cmd = ["du", "-sm",]
         cmd.extend(self.searchpath)
@@ -13,6 +21,7 @@ class clearcache():
         rawout = output.stdout.decode("UTF-8")
         size = [int(s) for s in rawout.split() if s.isdigit()][0]
         return size
+
     def check_dir(self):
         return os.path.isfile(r"/var/cache/apt/pkgcache.bin")
 
@@ -37,13 +46,13 @@ class removekernel():
         terget = ("linux-headers-", "linux-image-")
         self.removed = [tgt + version for version in olders for tgt in terget ]
         return self.removed
+
     @classmethod
     def removethem(self):
         cmd = "sudo apt-get --purge -y autoremove"
         command_l = cmd.split()
         command_l.extend(self.removed)
         subprocess.call(command_l)
-
 
 
 #Others

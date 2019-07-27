@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import subprocess
-
+import os.path
 class clearcache():
     def __init__(self, path):
         rpath = path + r"/*"
@@ -13,6 +13,9 @@ class clearcache():
         rawout = output.stdout.decode("UTF-8")
         size = [int(s) for s in rawout.split() if s.isdigit()][0]
         return size
+    def check_dir(self):
+        return os.path.isfile(r"/var/cache/apt/pkgcache.bin")
+
     def cleanit(self):
         cmd = "sudo rm -r " + self.removepath
         subprocess.run(cmd, shell=True)
@@ -56,25 +59,3 @@ def yesno(choice):
             return False
         else:
             return "Error"
-
-def swich(choice):
-    if choice == "":
-        return "Error"
-    try:
-        choice = int(choice[0])
-    except ValueError:
-        return "Please enter as an integer."
-    try:
-        task = list[choice - 1]
-    except IndexError:
-        return "The task is not find."
-    return task
-
-inst = clearcache(r"/var/cache/apt")
-#Main
-print("APT-cache size is {}MiB.\nAre you clean it?".format(inst.get_cachesize()))
-anser = yesno(input("Y/n "))
-if anser == True:
-    inst.cleanit()
-else:
-    exit(0)

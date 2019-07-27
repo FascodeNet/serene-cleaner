@@ -8,7 +8,7 @@ root.title("serene-cleaner")
 root.geometry("640x480")
 root.mainloop()
 
-class clearcache():
+class cleancache():
     def __init__(self, path):
         rpath = path + r"/*"
         self.searchpath = path.split()
@@ -22,8 +22,8 @@ class clearcache():
         size = [int(s) for s in rawout.split() if s.isdigit()][0]
         return size
 
-    def check_dir(self):
-        return os.path.isfile(r"/var/cache/apt/pkgcache.bin")
+    def check_dir(self, file):
+        return os.path.isfile(self.path + r"/" + file)
 
     def cleanit(self):
         cmd = "sudo rm -r " + self.removepath
@@ -41,8 +41,8 @@ class removekernel():
         del installing[0]
         olders = installing
         if not installing:
-            print("Do not have to remove old kernel.")
-            exit(0)
+            #Do not have to remove old kernel.
+            return 0
         terget = ("linux-headers-", "linux-image-")
         self.removed = [tgt + version for version in olders for tgt in terget ]
         return self.removed
@@ -53,7 +53,6 @@ class removekernel():
         command_l = cmd.split()
         command_l.extend(self.removed)
         subprocess.call(command_l)
-
 
 #Others
 def yesno(choice):

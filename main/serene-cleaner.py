@@ -5,13 +5,13 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
  
-class Serenecleaner(App):
+class MainWindow(App):
     def build(self):
-        self.title = 'Serene-cleaner'
+        self.title = 'serene-cleaner'
         return Label()
  
 if __name__ == "__main__":
-    Serenecleaner().run()
+    MainWindow().run()
 
 class Cleancache():
     def __init__(self, path):

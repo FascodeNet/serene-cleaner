@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 import subprocess
 import os.path
-import tkinter as tk
+from kivy.app import App
+from kivy.uix.label import Label
+from kivy.uix.gridlayout import GridLayout
+ 
+class Serenecleaner(App):
+    def build(self):
+        self.title = 'Serene-cleaner'
+        return Label()
+ 
+if __name__ == "__main__":
+    Serenecleaner().run()
 
-root = tk.Tk()
-root.title("serene-cleaner")
-root.geometry("640x480")
-root.mainloop()
-
-class cleancache():
+class Cleancache():
     def __init__(self, path):
         rpath = path + r"/*"
         self.searchpath = path.split()
@@ -31,7 +36,7 @@ class cleancache():
         return "Done"
 
 # Remove old kernels
-class removekernel():
+class Removekernel():
     removed = []
     @classmethod
     def get_oldkernels(self):
